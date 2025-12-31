@@ -41,4 +41,6 @@ api/instance/app.db
 /venv/
 /api/instance/
 .vscode/
-requirements1212.txt
+/api2/
+/requirements.txt
+/requirements1212.txt
