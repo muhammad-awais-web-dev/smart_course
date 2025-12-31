@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 interface User {
   id: number;
@@ -52,9 +53,8 @@ export default function DashboardPage() {
 
   if (user) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        {/* Header */}
-        <header className="bg-white dark:bg-gray-800 shadow">
+      <>
+        <header>
           <Navbar />
         </header>
 
@@ -118,7 +118,8 @@ export default function DashboardPage() {
             </div>
           </div>
         </main>
-      </div>
+        <Footer />
+      </>
     );
   }
 }

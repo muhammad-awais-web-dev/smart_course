@@ -15,15 +15,17 @@ const Navbar = () => {
           <header className="flex items-center justify-between whitespace-nowrap py-4">
             <div className="flex items-end justify-center gap-3 text-[#111318] dark:text-white hover:opacity-80 transition-opacity cursor-pointer">
               {/* Logo Placeholder */}
-              <div className="flex items-center justify-center">
-                <Image
-                  src="/WhiteRetinalSmartCourse.svg"
-                  alt="Logo"
-                  width={40}
-                  height={40}
-                />
-              </div>
-              <h2 className="text-2xl font-bold">Smart Course</h2>
+              <Link href="/">
+                <div className="flex items-center justify-center">
+                  <Image
+                    src="/WhiteRetinalSmartCourse.svg"
+                    alt="Logo"
+                    width={40}
+                    height={40}
+                  />
+                </div>
+                <h2 className="text-2xl font-bold">Smart Course</h2>
+              </Link>
             </div>
             <div className="flex flex-1 justify-end gap-8">
               {user ? (

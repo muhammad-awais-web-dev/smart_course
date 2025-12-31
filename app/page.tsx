@@ -1,15 +1,19 @@
 'use client';
 
-import Image from 'next/image'
-import Link from 'next/link'
-import HomeContent from './HomeContent';
 import Navbar from '@/components/Navbar';
+import Home_Hero from '@/components/Home/Home_Hero';
+import Home_Stats from '@/components/Home/Home_Stats';
+import Home_Features from '@/components/Home/Home_Features';
+import Footer from '@/components/Footer';
 
 export default function Home() {
   return (
     <>
     <Navbar />
-    <HomeContent />
+    <Home_Hero />
+    <Home_Stats />
+    <Home_Features />
+    <Footer />
     </>
   )
 }
