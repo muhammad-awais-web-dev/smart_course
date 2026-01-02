@@ -25,16 +25,16 @@ const Home_Hero = () => {
                     />
                   </g>
                 </svg>
-                <span>AI-Powered Recommendations</span>
+                <span>PERSONALIZED LEARNING PATHS</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-black leading-tight tracking-[-0.033em] bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60">
-                Intelligent Course Discovery via NLP
+                Find Your Next Skill, Faster
               </h1>
               <h2 className="text-base md:text-lg font-normal leading-relaxed text-[#637588] dark:text-[#9ca6ba] max-w-[600px] mx-auto lg:mx-0">
-                Stop searching, start learning. We utilize{" "}
-                <strong>TF-IDF vectorization</strong> and{" "}
-                <strong>N-Gram analysis</strong> to process thousands of course
-                descriptions and match them to your specific learning goals.
+                Overwhelmed by options? SmartCourse uses advanced machine
+                learning to analyze thousands of courses and filter out the
+                noise, delivering recommendations that actually fit your career
+                goals.
               </h2>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">

@@ -53,6 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (response.ok) {
         const data = await response.json();
         setUser(data);
+        localStorage.setItem("auth_token", authToken);
       } else {
         // Token invalid or expired
         localStorage.removeItem("auth_token");
