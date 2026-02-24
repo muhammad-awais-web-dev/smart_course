@@ -6,7 +6,7 @@ const Home_Stats = () => {
       <div className="layout-content-container flex flex-col max-w-[1200px] flex-1">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Stat 1 */}
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-[#3b4354] hover:border-primary/50 transition-colors group">
+          <div className="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-[#3b4354] hover:border-black dark:hover:border-white transition-colors group">
             <div className="flex justify-between items-start">
               <p className="text-[#637588] dark:text-[#9ca6ba] text-base font-medium">
                 Data Points Cleaned
@@ -34,7 +34,7 @@ const Home_Stats = () => {
           </div>
 
           {/* Stat 2 */}
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-[#3b4354] hover:border-primary/50 transition-colors group">
+          <div className="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-[#3b4354] hover:border-black dark:hover:border-white transition-colors group">
             <div className="flex justify-between items-start">
               <p className="text-[#637588] dark:text-[#9ca6ba] text-base font-medium">
                 Vectors Generated
@@ -68,7 +68,7 @@ const Home_Stats = () => {
           </div>
 
           {/* Stat 3 */}
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-[#3b4354] hover:border-primary/50 transition-colors group">
+          <div className="flex flex-col gap-2 rounded-xl p-6 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-[#3b4354] hover:border-black dark:hover:border-white transition-colors group">
             <div className="flex justify-between items-start">
               <p className="text-[#637588] dark:text-[#9ca6ba] text-base font-medium">
                 Recommendation Accuracy

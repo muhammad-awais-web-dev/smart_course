@@ -78,7 +78,7 @@ const Dataset_table = () => {
     <section className="flex select-none justify-center px-4 sm:px-6 lg:px-8 py-2 md:py-20 lg:py-4 bg-background-light dark:bg-background-dark">
       <div className="layout-content-container flex flex-col max-w-[1200px] flex-1">
         <div className="flex flex-col gap-2 md:gap-8">
-          <h2 className="text-4xl md:text-4xl font-black w-fit leading-tight tracking-[-0.033em] bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/100 dark:from-white dark:to-white/60">
+          <h2 className="text-4xl md:text-4xl font-black w-fit leading-tight tracking-[-0.033em] bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60">
             Dataset Details
           </h2>
           <p className="text-base md:text-lg font-normal leading-relaxed text-[#637588] dark:text-[#9ca6ba]">

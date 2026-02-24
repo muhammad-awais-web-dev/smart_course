@@ -10,7 +10,7 @@ const Home_Hero = () => {
           {/* Hero Text */}
           <div className="flex flex-col gap-8 flex-1 text-center lg:text-left">
             <div className="flex flex-col gap-4">
-              <div className="inline-flex hover:text-blue-500 hover:border-blue-500 transition-colors duration-300 items-center gap-2 self-center lg:self-start px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider">
+              <div className="inline-flex hover:text-black dark:hover:text-white hover:border-black dark:hover:border-white transition-colors duration-300 items-center gap-2 self-center lg:self-start px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-black dark:text-white text-xs font-bold uppercase tracking-wider">
                 <svg
                   height="25"
                   width="25"
@@ -38,7 +38,10 @@ const Home_Hero = () => {
               </h2>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <button className="flex min-w-[160px] gap-4 cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-white text-base font-bold bg-[rgba(37,106,244,0.5)] shadow-[0_0_20px_rgba(37,106,244,0.5)] hover:shadow-[0_0_30px_rgba(37,106,244,0.7)] hover:scale-105 transition-all duration-300">
+              <Link
+                href="/recommend"
+                className="flex min-w-[160px] gap-4 cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-black dark:bg-white text-white dark:text-black text-base font-bold border-2 border-black dark:border-white hover:shadow-md transition-all duration-300"
+              >
                 <span className="truncate">Get Recommendation</span>
                 <svg
                   height="25"
@@ -51,10 +54,10 @@ const Home_Hero = () => {
                     fill="currentColor"
                   />
                 </svg>
-              </button>
+              </Link>
               <Link
                 href="/dataset"
-                className="flex min-w-[160px] gap-4 cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-transparent border border-[#3b4354] hover:border-primary hover:text-primary text-[#111318] dark:text-white text-base font-bold transition-all duration-300"
+                className="flex min-w-[160px] gap-4 cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-transparent border-2 border-black dark:border-white text-[#111318] dark:text-white text-base font-bold hover:shadow-md transition-all duration-300"
               >
                 <span className="truncate">View Dataset</span>
                 <svg
@@ -99,7 +102,7 @@ const Home_Hero = () => {
                     backgroundImage: "url('https://i.pravatar.cc/100?img=3')",
                   }}
                 ></div>
-                <div className="w-10 h-10 bg-black rounded-full border-2 border-background-light dark:border-background-dark bg-primary text-white flex items-center justify-center text-xs font-bold">
+                <div className="w-10 h-10 bg-black rounded-full border-2 border-background-light dark:border-background-dark text-white flex items-center justify-center text-xs font-bold">
                   +2k
                 </div>
               </div>
@@ -115,7 +118,7 @@ const Home_Hero = () => {
               {/* You can replace this Image with a screenshot of your Pandas DataFrame or Jupyter Notebook later */}
               <div
                 className="absolute inset-0 bg-cover bg-center"
-                data-alt="Abstract futuristic blue data network visualization"
+                data-alt="Abstract futuristic data network visualization"
               >
                 <LottePlayer src="/MapAnimation.json" />
               </div>
@@ -141,11 +144,11 @@ const Home_Hero = () => {
                     </span>
                   </div>
                   <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full w-[98%] bg-green-400 bg-primary rounded-full"></div>
+                    <div className="h-full w-[98%] bg-black dark:bg-white rounded-full"></div>
                   </div>
                   <div className="flex justify-between mt-2 text-xs text-gray-400">
                     <span>Processing Bi-Grams</span>
-                    <span className="text-primary">TF-IDF: 0.98</span>
+                    <span className="text-gray-700 dark:text-gray-300">TF-IDF: 0.98</span>
                   </div>
                 </div>
               </div>

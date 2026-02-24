@@ -35,10 +35,10 @@ function CallbackContent() {
   }, [searchParams, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
       <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mb-4"></div>
-        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-gray-900 dark:border-white mb-4"></div>
+        <h2 className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-2">
           Completing Sign In...
         </h2>
         <p className="text-gray-600 dark:text-gray-400">
@@ -53,7 +53,7 @@ export default function AuthCallbackPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-gray-900 dark:border-white"></div>
       </div>
     }>
       <CallbackContent />
