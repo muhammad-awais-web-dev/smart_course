@@ -107,7 +107,7 @@ def index():
 @token_required
 def get_current_user():
     """Get current authenticated user info"""
-    user = User.query.get(request.user_id)
+    user = db.session.query(User).get(request.user_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
     return jsonify(user.to_dict())
@@ -187,26 +187,34 @@ def recommend_neural():
 def get_search_history():
     """Get user's search history"""
     try:
+        print(f"Fetching search history for user_id: {request.user_id}")
+        
         # Get all search history for the current user, ordered by date descending
-        searches = SearchHistory.query.filter_by(user_id=request.user_id).order_by(
+        searches = db.session.query(SearchHistory).filter_by(user_id=request.user_id).order_by(
             SearchHistory.created_at.desc()
         ).all()
+        
+        print(f"Found {len(searches)} search history items")
         
         result = []
         for search in searches:
             search_dict = search.to_dict()
             # Include saved courses for this search
-            saved_courses = SavedCourse.query.filter_by(search_id=search.id).all()
+            saved_courses = db.session.query(SavedCourse).filter_by(search_id=search.id).all()
             search_dict['saved_courses'] = [course.to_dict() for course in saved_courses]
             result.append(search_dict)
+        
+        print(f"Returning {len(result)} history items")
         
         return jsonify({
             "history": result,
             "total": len(result)
         })
     except Exception as e:
+        import traceback
         print(f"Error fetching search history: {str(e)}")
-        return jsonify({"error": "Failed to fetch search history"}), 500
+        print(f"Full traceback: {traceback.format_exc()}")
+        return jsonify({"error": f"Failed to fetch search history: {str(e)}"}), 500
 
 
 @app.route("/api/save", methods=['POST'])
@@ -222,7 +230,7 @@ def save_course():
             return jsonify({"error": "Missing required fields: course_id, course_title"}), 400
         
         # Check if already saved
-        existing = SavedCourse.query.filter_by(
+        existing = db.session.query(SavedCourse).filter_by(
             user_id=request.user_id,
             course_id=data['course_id']
         ).first()
@@ -265,7 +273,7 @@ def save_course():
 def delete_saved_course(course_id):
     """Delete a saved course from user's list"""
     try:
-        saved_course = SavedCourse.query.filter_by(
+        saved_course = db.session.query(SavedCourse).filter_by(
             user_id=request.user_id,
             course_id=course_id
         ).first()
@@ -289,7 +297,7 @@ def delete_saved_course(course_id):
 def get_saved_courses():
     """Get all saved courses for the current user"""
     try:
-        saved_courses = SavedCourse.query.filter_by(user_id=request.user_id).order_by(
+        saved_courses = db.session.query(SavedCourse).filter_by(user_id=request.user_id).order_by(
             SavedCourse.saved_at.desc()
         ).all()
         
@@ -310,14 +318,18 @@ def get_recommendations():
     Supports both TFIDF and Neural models
     """
     try:
+        print(f"Recommend endpoint called by user_id: {request.user_id}")
+        
         data = request.get_json()
         if not data:
+            print("No JSON body provided")
             return jsonify({"error": "No JSON body provided"}), 400
         
         query = data.get('query', '')
         model_type = data.get('model_type', 'both').lower()
         
         if not query:
+            print("No query provided")
             return jsonify({"error": "Query is required"}), 400
         
         # Ensure query is a string (handle list input from frontend)
@@ -331,16 +343,22 @@ def get_recommendations():
         # Get TFIDF recommendations if requested
         if model_type in ['both', 'tfidf']:
             try:
+                print("Calling get_recommendations_tfidf...")
                 tfidf_recs = get_recommendations_tfidf(query)
+                print(f"TFIDF returned: {type(tfidf_recs)}, count: {len(tfidf_recs) if isinstance(tfidf_recs, list) else 'N/A'}")
                 if isinstance(tfidf_recs, list):
                     recommendations.extend(tfidf_recs)
             except Exception as e:
+                import traceback
                 print(f"Error getting TFIDF recommendations: {str(e)}")
+                print(f"Traceback: {traceback.format_exc()}")
         
         # Get Neural recommendations if requested
         if model_type in ['both', 'neural']:
             try:
+                print("Calling get_recommendations_neural...")
                 neural_recs = get_recommendations_neural(query)
+                print(f"Neural returned: {type(neural_recs)}, count: {len(neural_recs) if isinstance(neural_recs, list) else 'N/A'}")
                 if isinstance(neural_recs, list):
                     # Filter out duplicates (by course_id)
                     existing_ids = set(r.get('course_id') for r in recommendations)
@@ -349,7 +367,9 @@ def get_recommendations():
                             recommendations.append(rec)
                             existing_ids.add(rec.get('course_id'))
             except Exception as e:
+                import traceback
                 print(f"Error getting Neural recommendations: {str(e)}")
+                print(f"Traceback: {traceback.format_exc()}")
         
         # Remove duplicates while preserving order
         seen_ids = set()
@@ -359,6 +379,8 @@ def get_recommendations():
             if course_id not in seen_ids:
                 seen_ids.add(course_id)
                 unique_recommendations.append(rec)
+        
+        print(f"Total unique recommendations: {len(unique_recommendations)}")
         
         # Save to search history
         try:
@@ -372,7 +394,9 @@ def get_recommendations():
             db.session.commit()
             print(f"✓ Search history saved: {query} ({len(unique_recommendations)} results)")
         except Exception as e:
+            import traceback
             print(f"✗ Error saving search history: {str(e)}")
+            print(f"Traceback: {traceback.format_exc()}")
             db.session.rollback()
         
         return jsonify({
@@ -381,7 +405,9 @@ def get_recommendations():
             "model_type": model_type
         })
     except Exception as e:
+        import traceback
         print(f"Error fetching recommendations: {str(e)}")
+        print(f"Full traceback: {traceback.format_exc()}")
         return jsonify({"error": f"Failed to fetch recommendations: {str(e)}"}), 500
 
 

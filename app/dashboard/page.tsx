@@ -21,10 +21,6 @@ interface SavedCourse extends Course {
   similarity_score: number;
 }
 
-interface RecommendedCourse extends Course {
-  similarity_score: number;
-}
-
 interface SearchHistoryItem {
   id: number;
   query: string;
@@ -40,12 +36,10 @@ export default function DashboardPage() {
   // Data states
   const [savedCourses, setSavedCourses] = useState<SavedCourse[]>([]);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
-  const [recommendations, setRecommendations] = useState<RecommendedCourse[]>([]);
   
   // Loading states
   const [loadingCourses, setLoadingCourses] = useState(true);
   const [loadingHistory, setLoadingHistory] = useState(true);
-  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
   
   // Error states
   const [errorCourses, setErrorCourses] = useState<string>("");
@@ -87,11 +81,6 @@ export default function DashboardPage() {
       
       const data = await response.json();
       setSavedCourses(data.saved_courses || []);
-      
-      // Auto-load recommendations if courses exist
-      if (data.saved_courses && data.saved_courses.length > 0) {
-        loadRecommendations(data.saved_courses);
-      }
     } catch (err) {
       setErrorCourses(err instanceof Error ? err.message : "Failed to load saved courses");
     } finally {
@@ -121,50 +110,6 @@ export default function DashboardPage() {
       setErrorHistory(err instanceof Error ? err.message : "Failed to load search history");
     } finally {
       setLoadingHistory(false);
-    }
-  };
-
-  const loadRecommendations = async (courses: SavedCourse[]) => {
-    try {
-      setLoadingRecommendations(true);
-      
-      // Build query from last 5 saved course titles
-      const query = courses
-        .slice(0, 5)
-        .map(c => c.course_title)
-        .join(", ");
-      
-      if (!query) return;
-
-      console.log("Fetching recommendations for last 5 saved courses:", query);
-
-      const response = await fetch("http://localhost:5328/api/recommend", {
-        method: "POST",
-        headers: getAuthHeader(),
-        body: JSON.stringify({
-          query,
-          model_type: "both",
-        }),
-      });
-
-      if (!response.ok) throw new Error(`Failed to load recommendations: ${response.status}`);
-      
-      const data = await response.json();
-      console.log("Recommendations received:", data);
-      
-      const savedIds = new Set(courses.map(c => c.course_id));
-      
-      // Filter out already saved courses
-      const filtered = (data.recommendations || [])
-        .filter((course: RecommendedCourse) => !savedIds.has(course.course_id))
-        .slice(0, 10);
-      
-      setRecommendations(filtered);
-    } catch (err) {
-      console.error("Error loading recommendations:", err);
-      setRecommendations([]);
-    } finally {
-      setLoadingRecommendations(false);
     }
   };
 
@@ -205,7 +150,7 @@ export default function DashboardPage() {
             Welcome, {user?.name}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Manage your saved courses and discover personalized recommendations
+            Manage your saved courses and search history
           </p>
         </section>
 
@@ -293,58 +238,6 @@ export default function DashboardPage() {
             </div>
           )}
         </section>
-
-        {/* Recommendations */}
-        {savedCourses.length > 0 && (
-          <section className="mb-16">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              Recommended For You ({recommendations.length})
-            </h2>
-
-            {loadingRecommendations ? (
-              <div className="text-center py-8">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900 dark:border-white"></div>
-                <p className="text-gray-600 dark:text-gray-400 mt-2">Generating recommendations...</p>
-              </div>
-            ) : recommendations.length === 0 ? (
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-8 text-center text-gray-600 dark:text-gray-400">
-                No recommendations available at this time
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                {recommendations.map(course => (
-                  <div
-                    key={course.course_id}
-                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900 hover:shadow-md transition-all flex flex-col"
-                  >
-                    <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 mb-2 text-sm">
-                      {course.course_title}
-                    </h3>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mb-3">
-                      {course.course_instructor_name}
-                    </p>
-                    <div className="flex items-center justify-between text-xs mb-3 flex-grow">
-                      <span className="text-gray-600 dark:text-gray-400">
-                        ⭐ {course.ratings?.toFixed(1) || "N/A"}
-                      </span>
-                      <span className="text-[#0bda5e] font-medium">
-                        {(course.similarity_score * 100).toFixed(0)}%
-                      </span>
-                    </div>
-                    <a
-                      href={course.course_links}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full text-center px-3 py-2 bg-black dark:bg-white text-white dark:text-black text-xs rounded font-medium hover:shadow-md transition-all"
-                    >
-                      View
-                    </a>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-        )}
 
         {/* Search History */}
         <section>
