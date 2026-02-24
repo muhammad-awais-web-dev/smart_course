@@ -65,12 +65,17 @@ def google_callback():
             )
             db.session.add(user)
         else:
-            # User exists - check if they're trying to use a different provider
-            if user.provider != 'google':
+            # User exists - update provider info and keep password if exists
+            if user.provider == 'password':
+                # User created with password, now linking Google
+                user.provider = 'google'
+                user.provider_id = user_info['sub']
+            elif user.provider != 'google':
+                # User has different OAuth provider
                 return redirect(
                     f"{Config.FRONTEND_URL}/login?error=email_exists_with_{user.provider}"
                 )
-            # Same provider - update user info
+            # Update user info
             user.last_login = datetime.utcnow()
             user.avatar = user_info.get('picture')
             user.name = user_info.get('name')
@@ -129,12 +134,17 @@ def github_callback():
             )
             db.session.add(user)
         else:
-            # User exists - check if they're trying to use a different provider
-            if user.provider != 'github':
+            # User exists - update provider info and keep password if exists
+            if user.provider == 'password':
+                # User created with password, now linking GitHub
+                user.provider = 'github'
+                user.provider_id = str(user_info['id'])
+            elif user.provider != 'github':
+                # User has different OAuth provider
                 return redirect(
                     f"{Config.FRONTEND_URL}/login?error=email_exists_with_{user.provider}"
                 )
-            # Same provider - update user info
+            # Update user info
             user.last_login = datetime.utcnow()
             user.avatar = user_info.get('avatar_url')
             user.name = user_info.get('name') or user_info.get('login')

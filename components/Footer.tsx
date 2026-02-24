@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -19,27 +20,27 @@ const Footer = () => {
           </div>
           <div className="flex flex-wrap items-center justify-center gap-8">
             <a
-              className="text-[#637588] dark:text-[#9ca6ba] hover:text-primary transition-colors text-sm font-medium"
+              className="text-[#637588] dark:text-[#9ca6ba] hover:text-black dark:hover:text-white transition-colors text-sm font-medium"
               href="#"
             >
               Privacy Policy
             </a>
             <a
-              className="text-[#637588] dark:text-[#9ca6ba] hover:text-primary transition-colors text-sm font-medium"
+              className="text-[#637588] dark:text-[#9ca6ba] hover:text-black dark:hover:text-white transition-colors text-sm font-medium"
               href="#"
             >
               Terms of Service
             </a>
-            <a
-              className="text-[#637588] dark:text-[#9ca6ba] hover:text-primary transition-colors text-sm font-medium"
-              href="#"
+            <Link
+              className="text-[#637588] dark:text-[#9ca6ba] hover:text-black dark:hover:text-white transition-colors text-sm font-medium"
+              href="/about"
             >
               Documentation
-            </a>
+            </Link>
           </div>
           <div className="flex justify-center gap-6">
             <a
-              className="text-[#637588] dark:text-[#9ca6ba] hover:text-primary transition-colors hover:scale-110 transform duration-200"
+              className="text-[#637588] dark:text-[#9ca6ba] hover:text-black dark:hover:text-white transition-colors hover:scale-110 transform duration-200"
               href="https://github.com/muhammad-awais-web-dev/"
             >
               <svg
@@ -55,7 +56,7 @@ const Footer = () => {
               </svg>
             </a>
             <a
-              className="text-[#637588] dark:text-[#9ca6ba] hover:text-primary transition-colors hover:scale-110 transform duration-200"
+              className="text-[#637588] dark:text-[#9ca6ba] hover:text-black dark:hover:text-white transition-colors hover:scale-110 transform duration-200"
               href="https://www.linkedin.com/in/muhammad-awais-web-dev/"
             >
               <svg
@@ -74,7 +75,7 @@ const Footer = () => {
               </svg>
             </a>
             <a
-              className="text-[#637588] dark:text-[#9ca6ba] hover:text-primary transition-colors hover:scale-110 transform duration-200"
+              className="text-[#637588] dark:text-[#9ca6ba] hover:text-black dark:hover:text-white transition-colors hover:scale-110 transform duration-200"
               href="https://x.com/WebMorph_Studio"
             >
               <svg

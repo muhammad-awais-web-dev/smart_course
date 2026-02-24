@@ -3,11 +3,11 @@ import React from "react";
 const Home_Features = () => {
   return (
     <div className="flex flex-1 justify-center py-20 px-4 md:px-10 relative overflow-hidden">
-      <div className="absolute right-0 top-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+      <div className="absolute right-0 top-1/2 w-[500px] h-[500px] bg-black/5 dark:bg-white/5 rounded-full blur-[100px] translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
       <div className="layout-content-container flex flex-col max-w-[1200px] flex-1 z-10">
         <div className="flex flex-col gap-12">
           <div className="flex flex-col gap-4 text-center md:text-left">
-            <h2 className="text-3xl md:text-4xl font-bold leading-tight tracking-tight text-[#111318] dark:text-white">
+            <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 leading-tight tracking-tight">
               Built on Data Science Principles
             </h2>
             <p className="text-[#637588] dark:text-[#9ca6ba] text-lg font-normal max-w-[720px]">
@@ -18,8 +18,8 @@ const Home_Features = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Feature 1 */}
-            <div className="flex flex-col gap-6 rounded-2xl border border-gray-200 dark:border-[#3b4354] bg-card-light dark:bg-card-dark p-8 hover:-translate-y-1 transition-transform duration-300 shadow-sm hover:shadow-xl hover:shadow-primary/10">
-              <div className="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-500">
+            <div className="flex flex-col gap-6 rounded-2xl border border-gray-200 dark:border-[#3b4354] bg-card-light dark:bg-card-dark p-8 hover:-translate-y-1 transition-transform duration-300 shadow-sm hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-white/10">
+              <div className="w-12 h-12 rounded-lg bg-gray-300/50 dark:bg-gray-700/50 flex items-center justify-center text-black dark:text-white">
                 <svg
                   height="25"
                   width="25"
@@ -37,7 +37,7 @@ const Home_Features = () => {
                 </svg>
               </div>
               <div className="flex flex-col gap-2">
-                <h3 className="text-[#111318] dark:text-white text-xl font-bold leading-tight">
+                <h3 className="text-xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60">
                   TF-IDF Vectorization
                 </h3>
                 <p className="text-[#637588] dark:text-[#9ca6ba] text-base leading-relaxed">
@@ -49,8 +49,8 @@ const Home_Features = () => {
             </div>
 
             {/* Feature 2 */}
-            <div className="flex flex-col gap-6 rounded-2xl border border-gray-200 dark:border-[#3b4354] bg-card-light dark:bg-card-dark p-8 hover:-translate-y-1 transition-transform duration-300 shadow-sm hover:shadow-xl hover:shadow-primary/10">
-              <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-500">
+            <div className="flex flex-col gap-6 rounded-2xl border border-gray-200 dark:border-[#3b4354] bg-card-light dark:bg-card-dark p-8 hover:-translate-y-1 transition-transform duration-300 shadow-sm hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-white/10">
+              <div className="w-12 h-12 rounded-lg bg-gray-300/50 dark:bg-gray-700/50 flex items-center justify-center text-black dark:text-white">
                 <svg
                   height="25"
                   width="25"
@@ -64,7 +64,7 @@ const Home_Features = () => {
                 </svg>
               </div>
               <div className="flex flex-col gap-2">
-                <h3 className="text-[#111318] dark:text-white text-xl font-bold leading-tight">
+                <h3 className="text-xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60">
                   Smart Data Cleaning
                 </h3>
                 <p className="text-[#637588] dark:text-[#9ca6ba] text-base leading-relaxed">
@@ -76,8 +76,8 @@ const Home_Features = () => {
             </div>
 
             {/* Feature 3 */}
-            <div className="flex flex-col gap-6 rounded-2xl border border-gray-200 dark:border-[#3b4354] bg-card-light dark:bg-card-dark p-8 hover:-translate-y-1 transition-transform duration-300 shadow-sm hover:shadow-xl hover:shadow-primary/10">
-              <div className="w-12 h-12 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-500">
+            <div className="flex flex-col gap-6 rounded-2xl border border-gray-200 dark:border-[#3b4354] bg-card-light dark:bg-card-dark p-8 hover:-translate-y-1 transition-transform duration-300 shadow-sm hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-white/10">
+              <div className="w-12 h-12 rounded-lg bg-gray-300/50 dark:bg-gray-700/50 flex items-center justify-center text-black dark:text-white">
                 <svg
                   height="25"
                   width="25"
@@ -91,7 +91,7 @@ const Home_Features = () => {
                 </svg>
               </div>
               <div className="flex flex-col gap-2">
-                <h3 className="text-[#111318] dark:text-white text-xl font-bold leading-tight">
+                <h3 className="text-xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60">
                   Cosine Similarity
                 </h3>
                 <p className="text-[#637588] dark:text-[#9ca6ba] text-base leading-relaxed">

@@ -26,7 +26,7 @@ const Dataset_Hero = () => {
           {/* Hero Text */}
           <div className="flex flex-col gap-8 flex-1 text-center lg:text-left">
             <div className="flex flex-col gap-4">
-              <div className="inline-flex hover:text-blue-500 hover:border-blue-500 transition-colors duration-300 items-center gap-2 self-center lg:self-start px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider">
+              <div className="inline-flex hover:text-black dark:hover:text-white hover:border-black dark:hover:border-white transition-colors duration-300 items-center gap-2 self-center lg:self-start px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-black dark:text-white text-xs font-bold uppercase tracking-wider">
                 <svg
                   height="25"
                   width="25"
@@ -47,7 +47,7 @@ const Dataset_Hero = () => {
                 </svg>
                 <span>HIGH-DIMENSIONAL DATASET</span>
               </div>
-              <h1 className="text-4xl md:text-6xl font-black leading-tight tracking-[-0.033em] bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/100 dark:from-white dark:to-white/60">
+              <h1 className="text-4xl md:text-6xl font-black leading-tight tracking-[-0.033em] bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60">
                 Curated Data for High-Precision NLP.
               </h1>
               <p className="text-base md:text-lg font-normal leading-relaxed text-[#637588] dark:text-[#9ca6ba] max-w-[600px] mx-auto lg:mx-0">
@@ -62,11 +62,11 @@ const Dataset_Hero = () => {
               <a
                 href="dataset.csv"
                 download={"Dataset.csv"}
-                className="flex min-w-[160px] gap-4 cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-white text-base font-bold bg-[rgba(37,106,244,0.5)] shadow-[0_0_20px_rgba(37,106,244,0.5)] hover:shadow-[0_0_30px_rgba(37,106,244,0.7)] hover:scale-105 transition-all duration-300"
+                className="flex min-w-[160px] gap-4 cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-black dark:bg-white text-white dark:text-black text-base font-bold border-2 border-black dark:border-white hover:shadow-md transition-all duration-300"
               >
                 <span className="truncate">
                   Download Dataset{" "}
-                  <span className=" text-green-600 ">(CSV)</span>{" "}
+                  <span className="text-gray-600 dark:text-gray-400">(CSV)</span>{" "}
                 </span>
                 <svg
                   height="25"
@@ -83,11 +83,11 @@ const Dataset_Hero = () => {
               <a
                 href="dataset.json"
                 download={"Dataset.csv"}
-                className="flex min-w-[160px] gap-4 cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-white text-base font-bold bg-[rgba(37,106,244,0.5)] shadow-[0_0_20px_rgba(37,106,244,0.5)] hover:shadow-[0_0_30px_rgba(37,106,244,0.7)] hover:scale-105 transition-all duration-300"
+                className="flex min-w-[160px] gap-4 cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-black dark:bg-white text-white dark:text-black text-base font-bold border-2 border-black dark:border-white hover:shadow-md transition-all duration-300"
               >
                 <span className="truncate">
                   Download Dataset{" "}
-                  <span className=" text-orange-600 ">(Json)</span>
+                  <span className="text-gray-600 dark:text-gray-400">(Json)</span>
                 </span>
                 <svg
                   height="25"
@@ -110,27 +110,27 @@ const Dataset_Hero = () => {
               {/* You can replace this Image with a screenshot of your Pandas DataFrame or Jupyter Notebook later */}
               <div
                 className="absolute inset-0 bg-cover bg-center flex flex-col items-center justify-center before:absolute before:inset-0 before:bg-black/20"
-                data-alt="Abstract futuristic blue data network visualization"
+                data-alt="Abstract futuristic data network visualization"
               >
                 <div className="flex flex-col items-center justify-center">
-                  <span className=" text-7xl font-extrabold flex items-end leading-tight tracking-[-0.033em] bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/100 dark:from-white dark:to-white/60">
+                  <span className=" text-7xl font-extrabold flex items-end leading-tight tracking-[-0.033em] bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60">
                     9,900
                     <span className=" text-5xl font-extrabold pb-3">+</span>
                   </span>
-                  <span className=" text-5xl font-light flex items-end leading-tight tracking-[-0.033em] bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/100 dark:from-white dark:to-white/60">
+                  <span className=" text-5xl font-light flex items-end leading-tight tracking-[-0.033em] bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60">
                     Courses
                   </span>
                 </div>
                 <code className="relative select-text mt-8 p-4 bg-black/30 rounded-lg text-sm font-mono text-left text-white/90 w-[90%] max-w-[600px] shadow-lg border border-white/10">
                   <span className=" text-green-500 ">{"{"}</span>
                   <div className=" w-full h-fit pl-5">
-                    <span className=" text-blue-300 ">FileSize:</span>
-                    <span className=" text-amber-600 ">"5.79MB",</span>
+                    <span className=" text-gray-400 ">FileSize:</span>
+                    <span className=" text-amber-600 ">\"5.79MB\",</span>
                     <br />
-                    <span className=" text-blue-300 ">ExportType:</span>
-                    <span className=" text-amber-600 ">"CSV & Json",</span>
+                    <span className=" text-gray-400 ">ExportType:</span>
+                    <span className=" text-amber-600 ">\"CSV & Json\",</span>
                     <br />
-                    <span className=" text-blue-300 ">Fields:</span>
+                    <span className=" text-gray-400 ">Fields:</span>
                     <br />
                     <span className=" text-green-500">{"["}</span>
                     <div className=" w-full  h-fit pl-5 flex flex-wrap gap-0">
