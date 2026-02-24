@@ -2,7 +2,7 @@ import React from "react";
 
 const Home_Stats = () => {
   return (
-    <div className="flex flex-1 justify-center py-5 px-4 md:px-10">
+    <div className="flex flex-1 justify-center py-5 px-4 md:px-10 bg-gray-50 dark:bg-gray-950">
       <div className="layout-content-container flex flex-col max-w-[1200px] flex-1">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Stat 1 */}

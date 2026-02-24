@@ -106,7 +106,7 @@ const Dataset_Hero = () => {
 
           {/* Hero Visual */}
           <div className="flex-1 w-full relative group perspective-1000">
-            <div className="relative w-full aspect-square md:aspect-video lg:aspect-square bg-card-dark rounded-2xl overflow-hidden border border-[#3b4354]/50 shadow-2xl">
+            <div className="relative w-full aspect-square md:aspect-video lg:aspect-square bg-black dark:bg-card-dark rounded-2xl overflow-hidden border border-gray-700 dark:border-[#3b4354]/50 shadow-2xl">
               {/* You can replace this Image with a screenshot of your Pandas DataFrame or Jupyter Notebook later */}
               <div
                 className="absolute inset-0 bg-cover bg-center flex flex-col items-center justify-center before:absolute before:inset-0 before:bg-black/20"

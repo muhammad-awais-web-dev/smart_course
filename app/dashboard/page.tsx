@@ -7,12 +7,22 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
 
-interface User {
-  id: number;
-  email: string;
-  name: string;
-  avatar?: string;
-  provider: string;
+interface Course {
+  course_id: number;
+  course_title: string;
+  course_instructor_name: string;
+  course_levels: string;
+  ratings: number;
+  course_links: string;
+}
+
+interface SavedCourse extends Course {
+  saved_at: string;
+  similarity_score: number;
+}
+
+interface RecommendedCourse extends Course {
+  similarity_score: number;
 }
 
 interface SearchHistoryItem {
@@ -21,285 +31,378 @@ interface SearchHistoryItem {
   model_type: string;
   result_count: number;
   created_at: string;
-  saved_courses?: SavedCourse[];
-}
-
-interface SavedCourse {
-  id: number;
-  course_id: number;
-  course_title: string;
-  course_instructor_name: string;
-  course_levels: string;
-  ratings: number;
-  similarity_score: number;
-  course_links: string;
-  saved_at: string;
 }
 
 export default function DashboardPage() {
-  const { user, loading, error, clearErrors, clearToken } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
-  const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
+  
+  // Data states
   const [savedCourses, setSavedCourses] = useState<SavedCourse[]>([]);
-  const [historyLoading, setHistoryLoading] = useState(false);
+  const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
+  const [recommendations, setRecommendations] = useState<RecommendedCourse[]>([]);
+  
+  // Loading states
+  const [loadingCourses, setLoadingCourses] = useState(true);
+  const [loadingHistory, setLoadingHistory] = useState(true);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+  
+  // Error states
+  const [errorCourses, setErrorCourses] = useState<string>("");
+  const [errorHistory, setErrorHistory] = useState<string>("");
 
+  // Redirect if not authenticated
   useEffect(() => {
-    // Only redirect if loading is complete and there's no user
     if (!loading && !user) {
       router.push("/login");
     }
   }, [loading, user, router]);
 
+  // Fetch data on mount
   useEffect(() => {
-    // Fetch search history and saved courses when user is authenticated
     if (user && !loading) {
-      fetchSearchHistory();
-      fetchSavedCourses();
+      loadSavedCourses();
+      loadSearchHistory();
     }
   }, [user, loading]);
 
-  const fetchSearchHistory = async () => {
+  const getAuthHeader = () => {
+    const token = localStorage.getItem("auth_token");
+    return {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+  };
+
+  const loadSavedCourses = async () => {
     try {
-      setHistoryLoading(true);
-      const token = localStorage.getItem("auth_token");
-      const response = await fetch("http://localhost:5328/api/history", {
-        headers: { Authorization: `Bearer ${token}` },
+      setLoadingCourses(true);
+      setErrorCourses("");
+      
+      const response = await fetch("http://localhost:5328/api/saved", {
+        headers: getAuthHeader(),
       });
-      if (response.ok) {
-        const data = await response.json();
-        setSearchHistory(data.history || []);
+
+      if (!response.ok) throw new Error(`Failed to load saved courses: ${response.status}`);
+      
+      const data = await response.json();
+      setSavedCourses(data.saved_courses || []);
+      
+      // Auto-load recommendations if courses exist
+      if (data.saved_courses && data.saved_courses.length > 0) {
+        loadRecommendations(data.saved_courses);
       }
     } catch (err) {
-      console.error("Error fetching search history:", err);
+      setErrorCourses(err instanceof Error ? err.message : "Failed to load saved courses");
     } finally {
-      setHistoryLoading(false);
+      setLoadingCourses(false);
     }
   };
 
-  const fetchSavedCourses = async () => {
+  const loadSearchHistory = async () => {
     try {
-      const token = localStorage.getItem("auth_token");
-      const response = await fetch("http://localhost:5328/api/saved", {
-        headers: { Authorization: `Bearer ${token}` },
+      setLoadingHistory(true);
+      setErrorHistory("");
+      
+      console.log("Fetching search history...");
+      
+      const response = await fetch("http://localhost:5328/api/history", {
+        headers: getAuthHeader(),
       });
-      if (response.ok) {
-        const data = await response.json();
-        setSavedCourses(data.saved_courses || []);
-      }
+
+      if (!response.ok) throw new Error(`Failed to load history: ${response.status}`);
+      
+      const data = await response.json();
+      console.log("Search history response:", data);
+      
+      setSearchHistory(data.history || []);
     } catch (err) {
-      console.error("Error fetching saved courses:", err);
+      console.error("Error loading history:", err);
+      setErrorHistory(err instanceof Error ? err.message : "Failed to load search history");
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  const loadRecommendations = async (courses: SavedCourse[]) => {
+    try {
+      setLoadingRecommendations(true);
+      
+      // Build query from last 5 saved course titles
+      const query = courses
+        .slice(0, 5)
+        .map(c => c.course_title)
+        .join(", ");
+      
+      if (!query) return;
+
+      console.log("Fetching recommendations for last 5 saved courses:", query);
+
+      const response = await fetch("http://localhost:5328/api/recommend", {
+        method: "POST",
+        headers: getAuthHeader(),
+        body: JSON.stringify({
+          query,
+          model_type: "both",
+        }),
+      });
+
+      if (!response.ok) throw new Error(`Failed to load recommendations: ${response.status}`);
+      
+      const data = await response.json();
+      console.log("Recommendations received:", data);
+      
+      const savedIds = new Set(courses.map(c => c.course_id));
+      
+      // Filter out already saved courses
+      const filtered = (data.recommendations || [])
+        .filter((course: RecommendedCourse) => !savedIds.has(course.course_id))
+        .slice(0, 10);
+      
+      setRecommendations(filtered);
+    } catch (err) {
+      console.error("Error loading recommendations:", err);
+      setRecommendations([]);
+    } finally {
+      setLoadingRecommendations(false);
     }
   };
 
   const handleRemoveSavedCourse = async (courseId: number) => {
     try {
-      const token = localStorage.getItem("auth_token");
       const response = await fetch(`http://localhost:5328/api/save/${courseId}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getAuthHeader(),
       });
+
       if (response.ok) {
-        setSavedCourses(savedCourses.filter((c) => c.course_id !== courseId));
+        setSavedCourses(prev => prev.filter(c => c.course_id !== courseId));
       }
     } catch (err) {
       console.error("Error removing saved course:", err);
     }
   };
 
-  const handleSearchAgain = (query: string) => {
-    router.push(`/recommend?q=${encodeURIComponent(query)}`);
-  };
-
-  const handleLogout = () => {
-    clearToken();
-    router.push("/login");
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-gray-900 dark:border-white mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
-  if (error.length > 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center text-red-500">
-          <p>{error[0]}</p>
-        </div>
-      </div>
-    );
-  }
+  return (
+    <div className="min-h-screen bg-white dark:bg-black flex flex-col">
+      <Navbar />
+      
+      <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-12">
+        {/* Header */}
+        <section className="mb-12">
+          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-2">
+            Welcome, {user?.name}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Manage your saved courses and discover personalized recommendations
+          </p>
+        </section>
 
-  if (user) {
-    return (
-      <>
-        <header>
-          <Navbar />
-        </header>
-
-        {/* Main Content */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* User Profile Card */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-            <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-4">
-              Your Profile
+        {/* Saved Courses */}
+        <section className="mb-16">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Saved Courses ({savedCourses.length})
             </h2>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                {user?.avatar && (
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    className="w-20 h-20 rounded-full"
-                  />
-                )}
-                <div>
-                  <p className="text-lg font-medium text-gray-900 dark:text-white">
-                    {user?.name}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-400">{user?.email}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
-                    Signed in with{" "}
-                    <span className="capitalize font-medium">{user?.provider}</span>
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-
-          {/* Welcome Message */}
-          <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-6 mb-6 border-2 border-gray-300 dark:border-gray-700">
-            <h2 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-2">
-              Welcome, {user?.name?.split(" ")[0]}!
-            </h2>
-            <p className="text-gray-700 dark:text-gray-300 mb-4">
-              Start exploring personalized course recommendations tailored to your
-              interests!
-            </p>
             <Link
               href="/recommend"
-              className="inline-block px-6 py-2 bg-black dark:bg-white text-white dark:text-black font-medium rounded-lg transition-colors hover:shadow-md"
+              className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:shadow-md transition-all"
             >
-              Search for Courses
+              Find More
             </Link>
           </div>
 
-          {/* Saved Courses Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-            <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-4">
-              Saved Courses ({savedCourses.length})
-            </h2>
-            {savedCourses.length === 0 ? (
-              <p className="text-gray-600 dark:text-gray-400">
-                No saved courses yet.{" "}
-                <Link href="/recommend" className="text-gray-700 dark:text-gray-300 hover:underline font-semibold">
-                  Start searching
-                </Link>{" "}
-                to save your favorite courses!
+          {loadingCourses ? (
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900 dark:border-white"></div>
+              <p className="text-gray-600 dark:text-gray-400 mt-2">Loading courses...</p>
+            </div>
+          ) : errorCourses ? (
+            <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-800 dark:text-red-200">
+              <p className="font-semibold mb-2">Error Loading Courses</p>
+              <p className="text-sm">{errorCourses}</p>
+              <button
+                onClick={loadSavedCourses}
+                className="mt-3 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded text-sm transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          ) : savedCourses.length === 0 ? (
+            <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-12 text-center">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                No saved courses yet
               </p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {savedCourses.map((course) => (
-                  <div
-                    key={course.course_id}
-                    className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4"
-                  >
-                    <h3 className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 line-clamp-2 mb-2">
-                      {course.course_title}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                      {course.course_instructor_name || "Unknown"}
-                    </p>
-                    <div className="flex justify-between text-sm mb-3">
-                      <span className="text-gray-600 dark:text-gray-300">
-                        Rating: {course.ratings?.toFixed(1) || "N/A"}
-                      </span>
-                      <span className="text-gray-600 dark:text-gray-400">
-                        {course.course_levels || "All Levels"}
-                      </span>
-                    </div>
-                    <div className="flex gap-2">
-                      <a
-                        href={course.course_links}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 text-center px-3 py-2 bg-black dark:bg-white text-white dark:text-black text-sm rounded transition-colors hover:shadow-md"
-                      >
-                        View
-                      </a>
-                      <button
-                        onClick={() => handleRemoveSavedCourse(course.course_id)}
-                        className="px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-600 dark:text-red-400 text-sm rounded transition-colors"
-                      >
-                        Remove
-                      </button>
-                    </div>
+              <Link
+                href="/recommend"
+                className="inline-block px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:shadow-md transition-all"
+              >
+                Start Searching
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {savedCourses.map(course => (
+                <div
+                  key={course.course_id}
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900 hover:shadow-md transition-all group"
+                >
+                  <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 mb-2">
+                    {course.course_title}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                    by {course.course_instructor_name}
+                  </p>
+                  <div className="flex justify-between items-center text-sm mb-4">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      ⭐ {course.ratings?.toFixed(1) || "N/A"}
+                    </span>
+                    <span className="text-gray-600 dark:text-gray-400">
+                      {course.course_levels || "All"}
+                    </span>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Search History Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-4">
-              Search History
-            </h2>
-            {historyLoading ? (
-              <p className="text-gray-600 dark:text-gray-400">Loading...</p>
-            ) : searchHistory.length === 0 ? (
-              <p className="text-gray-600 dark:text-gray-400">
-                No search history yet. Start{" "}
-                <Link href="/recommend" className="text-gray-700 dark:text-gray-300 hover:underline font-semibold">
-                  searching for courses
-                </Link>
-                !
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {searchHistory.map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 flex items-center justify-between"
-                  >
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {item.query}
-                      </p>
-                      <div className="flex gap-4 text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        <span>Model: {item.model_type.toUpperCase()}</span>
-                        <span>{item.result_count} results</span>
-                        <span>
-                          {new Date(item.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleSearchAgain(item.query)}
-                      className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black text-sm rounded transition-colors ml-4 hover:shadow-md"
+                  <div className="flex gap-2">
+                    <a
+                      href={course.course_links}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 text-center px-3 py-2 bg-black dark:bg-white text-white dark:text-black text-sm rounded font-medium hover:shadow-md transition-all"
                     >
-                      Search Again
+                      View
+                    </a>
+                    <button
+                      onClick={() => handleRemoveSavedCourse(course.course_id)}
+                      className="px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-600 dark:text-red-400 text-sm rounded transition-colors"
+                    >
+                      Remove
                     </button>
                   </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Recommendations */}
+        {savedCourses.length > 0 && (
+          <section className="mb-16">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              Recommended For You ({recommendations.length})
+            </h2>
+
+            {loadingRecommendations ? (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900 dark:border-white"></div>
+                <p className="text-gray-600 dark:text-gray-400 mt-2">Generating recommendations...</p>
+              </div>
+            ) : recommendations.length === 0 ? (
+              <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-8 text-center text-gray-600 dark:text-gray-400">
+                No recommendations available at this time
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                {recommendations.map(course => (
+                  <div
+                    key={course.course_id}
+                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900 hover:shadow-md transition-all flex flex-col"
+                  >
+                    <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 mb-2 text-sm">
+                      {course.course_title}
+                    </h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mb-3">
+                      {course.course_instructor_name}
+                    </p>
+                    <div className="flex items-center justify-between text-xs mb-3 flex-grow">
+                      <span className="text-gray-600 dark:text-gray-400">
+                        ⭐ {course.ratings?.toFixed(1) || "N/A"}
+                      </span>
+                      <span className="text-[#0bda5e] font-medium">
+                        {(course.similarity_score * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                    <a
+                      href={course.course_links}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full text-center px-3 py-2 bg-black dark:bg-white text-white dark:text-black text-xs rounded font-medium hover:shadow-md transition-all"
+                    >
+                      View
+                    </a>
+                  </div>
                 ))}
               </div>
             )}
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
-  }
+          </section>
+        )}
+
+        {/* Search History */}
+        <section>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            Search History
+          </h2>
+
+          {loadingHistory ? (
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900 dark:border-white"></div>
+              <p className="text-gray-600 dark:text-gray-400 mt-2">Loading history...</p>
+            </div>
+          ) : errorHistory ? (
+            <div className="bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 text-yellow-800 dark:text-yellow-200">
+              <p className="font-semibold mb-2">Warning</p>
+              <p className="text-sm">{errorHistory}</p>
+              <button
+                onClick={loadSearchHistory}
+                className="mt-3 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded text-sm transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          ) : searchHistory.length === 0 ? (
+            <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-8 text-center text-gray-600 dark:text-gray-400">
+              No search history yet. Start searching on the{" "}
+              <Link href="/recommend" className="text-blue-500 hover:underline">
+                recommendation page
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {searchHistory.map(item => (
+                <div
+                  key={item.id}
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900 hover:shadow-md transition-all"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        {item.query}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        Model: {item.model_type.toUpperCase()} • Results: {item.result_count}
+                      </p>
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap ml-4">
+                      {new Date(item.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
 }

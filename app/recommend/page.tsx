@@ -242,7 +242,7 @@ export default function RecommendPage() {
             <div className="flex flex-wrap gap-4 items-center">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Algorithm:</span>
               <div className="flex gap-3 flex-wrap">
-                <label className="flex items-center gap-2 cursor-pointer px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors">
+                <label className="flex items-center gap-2 cursor-pointer px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                   <input
                     type="radio"
                     value="tfidf"
@@ -250,9 +250,9 @@ export default function RecommendPage() {
                     onChange={(e) => setModelType(e.target.value as any)}
                     className="w-4 h-4"
                   />
-                  <span className="text-sm font-medium">Keyword</span>
+                  <span className="text-sm font-medium">TF-IDF</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors">
+                <label className="flex items-center gap-2 cursor-pointer px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                   <input
                     type="radio"
                     value="neural"
@@ -260,9 +260,9 @@ export default function RecommendPage() {
                     onChange={(e) => setModelType(e.target.value as any)}
                     className="w-4 h-4"
                   />
-                  <span className="text-sm font-medium">Semantic</span>
+                  <span className="text-sm font-medium">Neural</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors">
+                <label className="flex items-center gap-2 cursor-pointer px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                   <input
                     type="radio"
                     value="both"
@@ -297,7 +297,7 @@ export default function RecommendPage() {
         {/* TF-IDF Results */}
         {results.tfidf && (
           <div className="mb-16">
-            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-8">Keyword-Based Results</h2>
+            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-8">TF-IDF Results</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {results.tfidf.recommendations.map((course) => (
                 <CourseCard
@@ -315,7 +315,7 @@ export default function RecommendPage() {
         {/* Neural Results */}
         {results.neural && (
           <div>
-            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-8">Semantic Results</h2>
+            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-8">Neural Results</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {results.neural.recommendations.map((course) => (
                 <CourseCard
