@@ -3,6 +3,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
+import {LuLockOpen, LuSave, LuHistory, LuBot } from "react-icons/lu";
 
 export default function AboutPage() {
   return (
@@ -311,7 +312,7 @@ export default function AboutPage() {
                 {/* Feature 1 */}
                 <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 dark:border-[#3b4354] bg-card-light dark:bg-card-dark p-6">
                   <div className="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-900 dark:text-white text-xl">
-                    🔐
+                    <LuLockOpen />
                   </div>
                   <div>
                     <h4 className="font-semibold text-[#111318] dark:text-white mb-2">
@@ -326,7 +327,7 @@ export default function AboutPage() {
                 {/* Feature 2 */}
                 <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 dark:border-[#3b4354] bg-card-light dark:bg-card-dark p-6">
                   <div className="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-900 dark:text-white text-xl">
-                    💾
+                    <LuSave/>
                   </div>
                   <div>
                     <h4 className="font-semibold text-[#111318] dark:text-white mb-2">
@@ -341,7 +342,7 @@ export default function AboutPage() {
                 {/* Feature 3 */}
                 <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 dark:border-[#3b4354] bg-card-light dark:bg-card-dark p-6">
                   <div className="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-900 dark:text-white text-xl">
-                    📊
+                    <LuHistory/>
                   </div>
                   <div>
                     <h4 className="font-semibold text-[#111318] dark:text-white mb-2">
@@ -356,7 +357,7 @@ export default function AboutPage() {
                 {/* Feature 4 */}
                 <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 dark:border-[#3b4354] bg-card-light dark:bg-card-dark p-6">
                   <div className="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-900 dark:text-white text-xl">
-                    🤖
+                    <LuBot/>
                   </div>
                   <div>
                     <h4 className="font-semibold text-[#111318] dark:text-white mb-2">

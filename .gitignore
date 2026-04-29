@@ -8,6 +8,10 @@
 # testing
 /coverage
 
+/FinalDeliverables
+/Plan
+/Documentation
+
 # next.js
 /.next/
 /out/
