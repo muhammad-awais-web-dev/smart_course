@@ -61,7 +61,13 @@ const Navbar = () => {
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Ensure component is mounted before rendering theme-dependent content
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,7 +129,21 @@ const Navbar = () => {
             )}
 
             {/* Navigation & Auth */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-3 md:gap-6">
+              {/* Theme Toggle - Always visible */}
+              {mounted && (
+                <button
+                  onClick={() => {
+                    const newTheme = theme === "dark" ? "light" : "dark";
+                    setTheme(newTheme);
+                  }}
+                  className="p-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200 hover:shadow-md"
+                  title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+                >
+                  {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+                </button>
+              )}
+
               {user ? (
                 <>
                   <nav className="hidden lg:flex items-center gap-6">
@@ -198,11 +218,25 @@ const Navbar = () => {
                           </h3>
 
                           <button
-                            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-sm font-medium text-black dark:text-white"
+                            onClick={() => {
+                              console.log("Current theme:", theme);
+                              const newTheme = theme === "dark" ? "light" : "dark";
+                              console.log("Setting theme to:", newTheme);
+                              setTheme(newTheme);
+                            }}
+                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium text-gray-900 dark:text-white"
                           >
-                            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-                            <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                            {mounted ? (
+                              <>
+                                {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+                                <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                              </>
+                            ) : (
+                              <>
+                                <MoonIcon />
+                                <span>Loading...</span>
+                              </>
+                            )}
                           </button>
 
                           <h3 className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest mt-4">

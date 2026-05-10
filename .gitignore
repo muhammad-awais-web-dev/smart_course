@@ -8,6 +8,10 @@
 # testing
 /coverage
 
+/FinalDeliverables
+/Plan
+/Documentation
+
 # next.js
 /.next/
 /out/
@@ -43,3 +47,5 @@ api/instance/app.db
 .vscode/
 /api2/
 /requirements1212.txt
+
+/MD_files/

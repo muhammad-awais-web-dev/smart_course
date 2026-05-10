@@ -6,7 +6,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import { ThemeProvider } from "next-themes";
 
 interface AuthContextType {
   user?: {
@@ -91,22 +90,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [token]);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <AuthContext.Provider
-        value={{
-          user,
-          setUser,
-          clearErrors,
-          loading,
-          error,
-          token,
-          clearToken,
-          setToken,
-        }}
-      >
-        {children}
-      </AuthContext.Provider>
-    </ThemeProvider>
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser,
+        clearErrors,
+        loading,
+        error,
+        token,
+        clearToken,
+        setToken,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
 };
 
