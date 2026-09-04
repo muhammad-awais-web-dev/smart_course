@@ -68,18 +68,34 @@ def get_recommendations_tfidf(query, df=df):
 
     cosine_similarities = linear_kernel(query_vec, tfidf_matrix).flatten()
 
-    sim_score = list(enumerate(cosine_similarities))
-
-    sim_score = sorted(sim_score, key=lambda x: x[1], reverse=True)
-    if sim_score[0][1] == 0:
-        return "No similar courses found. Please try a different query."
+    # Sort indices descending using fast numpy sorting
+    sorted_indices = np.argsort(cosine_similarities)[::-1]
     
-    output = []
-    sim_score = sim_score[0:10]  # Get top 10 similar courses
-    course_indices = [i[0] for i in sim_score]
+    # Fetch course links as a numpy array for O(1) index lookup
+    links = df['course_links'].values
+    
+    # Filter duplicates based on course_links
+    unique_indices = []
+    seen_links = set()
+    similarity_values = []
+    
+    for idx in sorted_indices:
+        score = cosine_similarities[idx]
+        if score == 0:
+            break
+        link = links[idx]
+        if link not in seen_links:
+            seen_links.add(link)
+            unique_indices.append(idx)
+            similarity_values.append(score)
+            if len(unique_indices) == 10:
+                break
+                
+    if not unique_indices:
+        return "No similar courses found. Please try a different query."
 
-    recommended_courses = df.iloc[course_indices].copy()
-    recommended_courses['similarity_score'] = [i[1] for i in sim_score]
+    recommended_courses = df.iloc[unique_indices].copy()
+    recommended_courses['similarity_score'] = similarity_values
     
     return recommended_courses.to_dict('records')
 
@@ -90,12 +106,28 @@ def get_recommendations_neural(query):
     # 2. Calculate Similarity against all courses
     sim_scores = cosine_similarity(query_embedding, nn_embeddings).flatten()
     
-    # 3. Sort and Get Top 10
-    top_indices = np.argsort(sim_scores)[::-1][:10]
+    # 3. Sort indices descending
+    sorted_indices = np.argsort(sim_scores)[::-1]
     
-    # Neural nets rarely give exactly 0, so we just return the top results
-    recommended_courses = df.iloc[top_indices].copy()
-    recommended_courses['similarity_score'] = sim_scores[top_indices]
+    # Fetch course links as a numpy array for O(1) index lookup
+    links = df['course_links'].values
+    
+    # Filter duplicates based on course_links
+    unique_indices = []
+    seen_links = set()
+    similarity_values = []
+    
+    for idx in sorted_indices:
+        link = links[idx]
+        if link not in seen_links:
+            seen_links.add(link)
+            unique_indices.append(idx)
+            similarity_values.append(sim_scores[idx])
+            if len(unique_indices) == 10:
+                break
+                
+    recommended_courses = df.iloc[unique_indices].copy()
+    recommended_courses['similarity_score'] = similarity_values
     return recommended_courses.to_dict('records')
 
 # API Routes

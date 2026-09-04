@@ -1,13 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 // SVG Icons
 const BookmarkIcon = ({ filled = false }: { filled?: boolean }) => (
-  <svg className="w-5 h-5" fill={filled ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+  <svg
+    className="w-5 h-5"
+    fill={filled ? "currentColor" : "none"}
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -18,7 +23,12 @@ const BookmarkIcon = ({ filled = false }: { filled?: boolean }) => (
 );
 
 const StarIcon = ({ filled = false }: { filled?: boolean }) => (
-  <svg className="w-4 h-4 inline" fill={filled ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+  <svg
+    className="w-4 h-4 inline"
+    fill={filled ? "currentColor" : "none"}
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -36,6 +46,9 @@ interface Course {
   ratings: number;
   similarity_score: number;
   course_links: string;
+  course_thumbnail_image?: string;
+  total_no_of_lectures?: number;
+  total_reviews?: string;
   [key: string]: any;
 }
 
@@ -44,7 +57,7 @@ interface Recommendation {
   recommendations: Course[];
 }
 
-export default function RecommendPage() {
+function RecommendContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
@@ -52,8 +65,13 @@ export default function RecommendPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [query, setQuery] = useState(initialQuery);
-  const [modelType, setModelType] = useState<"both" | "tfidf" | "neural">("both");
-  const [results, setResults] = useState<{ tfidf?: Recommendation; neural?: Recommendation }>({});
+  const [modelType, setModelType] = useState<"both" | "tfidf" | "neural">(
+    "both",
+  );
+  const [results, setResults] = useState<{
+    tfidf?: Recommendation;
+    neural?: Recommendation;
+  }>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [savedCourses, setSavedCourses] = useState<Set<number>>(new Set());
@@ -85,7 +103,10 @@ export default function RecommendPage() {
       });
       if (response.ok) {
         const data = await response.json();
-        const ids = new Set((data.saved_courses?.map((c: Course) => c.course_id) || []) as number[]);
+        const ids = new Set(
+          (data.saved_courses?.map((c: Course) => c.course_id) ||
+            []) as number[],
+        );
         setSavedCourses(ids);
       }
     } catch (err) {
@@ -112,7 +133,7 @@ export default function RecommendPage() {
       if (modelType === "tfidf" || modelType === "both") {
         const tfidfResponse = await fetch(
           `http://localhost:5328/api/recommend_tfidf?query=${encodeURIComponent(searchQuery)}`,
-          fetchOptions
+          fetchOptions,
         );
         if (tfidfResponse.ok) {
           const tfidfData = await tfidfResponse.json();
@@ -123,7 +144,7 @@ export default function RecommendPage() {
       if (modelType === "neural" || modelType === "both") {
         const neuralResponse = await fetch(
           `http://localhost:5328/api/recommend_neural?query=${encodeURIComponent(searchQuery)}`,
-          fetchOptions
+          fetchOptions,
         );
         if (neuralResponse.ok) {
           const neuralData = await neuralResponse.json();
@@ -155,6 +176,9 @@ export default function RecommendPage() {
           ratings: course.ratings,
           similarity_score: course.similarity_score,
           course_links: course.course_links,
+          course_thumbnail_image: course.course_thumbnail_image,
+          total_no_of_lectures: course.total_no_of_lectures,
+          total_reviews: course.total_reviews,
         }),
       });
 
@@ -173,10 +197,13 @@ export default function RecommendPage() {
   const handleRemoveSavedCourse = async (courseId: number) => {
     try {
       const token = localStorage.getItem("auth_token");
-      const response = await fetch(`http://localhost:5328/api/save/${courseId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        `http://localhost:5328/api/save/${courseId}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
 
       if (response.ok) {
         setSavedCourses((prev) => {
@@ -213,13 +240,17 @@ export default function RecommendPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-black flex flex-col">
       <Navbar />
-      
+
       {/* Hero Search Section */}
       <div className="bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-6xl mx-auto px-4 py-16">
-          <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-2">Find Your Perfect Course</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">Discover personalized learning paths powered by AI</p>
-          
+          <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-2">
+            Find Your Perfect Course
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
+            Discover personalized learning paths powered by AI
+          </p>
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex gap-3">
               <input
@@ -240,7 +271,9 @@ export default function RecommendPage() {
 
             {/* Model Selection */}
             <div className="flex flex-wrap gap-4 items-center">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Algorithm:</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Algorithm:
+              </span>
               <div className="flex gap-3 flex-wrap">
                 <label className="flex items-center gap-2 cursor-pointer px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                   <input
@@ -289,7 +322,9 @@ export default function RecommendPage() {
         {Object.keys(results).length === 0 && !loading && (
           <div className="text-center py-16">
             <p className="text-gray-600 dark:text-gray-400 text-lg">
-              {initialQuery ? "Loading results..." : "Enter a query to find courses"}
+              {initialQuery
+                ? "Loading results..."
+                : "Enter a query to find courses"}
             </p>
           </div>
         )}
@@ -297,7 +332,9 @@ export default function RecommendPage() {
         {/* TF-IDF Results */}
         {results.tfidf && (
           <div className="mb-16">
-            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-8">TF-IDF Results</h2>
+            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-8">
+              TF-IDF Results
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {results.tfidf.recommendations.map((course) => (
                 <CourseCard
@@ -315,7 +352,9 @@ export default function RecommendPage() {
         {/* Neural Results */}
         {results.neural && (
           <div>
-            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-8">Neural Results</h2>
+            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-8">
+              Neural Results
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {results.neural.recommendations.map((course) => (
                 <CourseCard
@@ -347,12 +386,24 @@ function CourseCard({
   onSave: () => void;
   onRemove: () => void;
 }) {
+  const FALLBACK_IMAGE = "https://placehold.co/600x400.png";
   const scorePercentage = Math.round((course.similarity_score || 0) * 100);
   const ratingCount = Math.round(course.ratings || 0);
 
   return (
     <div className="bg-white dark:bg-gray-950 border-2 border-gray-200 dark:border-gray-800 rounded-xl hover:border-black dark:hover:border-white hover:shadow-lg transition-all overflow-hidden h-full flex flex-col">
       <div className="p-6 flex-1 flex flex-col">
+        <img
+          src={course.course_thumbnail_image || FALLBACK_IMAGE}
+          alt={course.course_title}
+          onError={(e) => {
+            const target = e.currentTarget;
+            if (target.src !== FALLBACK_IMAGE) {
+              target.src = FALLBACK_IMAGE;
+            }
+          }}
+          className="w-full h-48 object-cover mb-4 rounded-lg"
+        />
         <h3 className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-[#111318] to-[#111318]/70 dark:from-white dark:to-white/60 mb-2 line-clamp-2">
           {course.course_title}
         </h3>
@@ -363,27 +414,48 @@ function CourseCard({
 
         <div className="mb-6 space-y-3 flex-1">
           <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-600 dark:text-gray-400 font-medium">Level</span>
+            <span className="text-gray-600 dark:text-gray-400 font-medium">
+              Level
+            </span>
             <span className="font-semibold text-black dark:text-white">
               {course.course_levels || "N/A"}
             </span>
           </div>
 
           <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-600 dark:text-gray-400 font-medium">Rating</span>
+            <span className="text-gray-600 dark:text-gray-400 font-medium">
+              Rating
+            </span>
             <div className="flex items-center gap-2">
               {Array.from({ length: 5 }).map((_, i) => (
                 <StarIcon key={i} filled={i < ratingCount} />
               ))}
-              <span className="ml-1 font-semibold text-black dark:text-white">{course.ratings?.toFixed(1)}</span>
+              <span className="ml-1 font-semibold text-black dark:text-white">
+                {course.ratings?.toFixed(1)} ({parseInt(course.total_reviews?.toString() || "0").toLocaleString() || null})
+              </span>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-gray-600 dark:text-gray-400 font-medium">
+              Lectures
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="ml-1 font-semibold text-black dark:text-white">
+                {course.total_no_of_lectures || "N/A"}
+              </span>
             </div>
           </div>
 
           {/* Relevance Score */}
           <div className="border-t border-gray-200 dark:border-gray-800 pt-3">
             <div className="flex justify-between items-center text-sm mb-2">
-              <span className="text-gray-600 dark:text-gray-400 font-medium">Match Score</span>
-              <span className="font-bold text-black dark:text-white text-base">{scorePercentage}%</span>
+              <span className="text-gray-600 dark:text-gray-400 font-medium">
+                Match Score
+              </span>
+              <span className="font-bold text-black dark:text-white text-base">
+                {scorePercentage}%
+              </span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2.5 overflow-hidden">
               <div
@@ -416,5 +488,22 @@ function CourseCard({
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RecommendPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-black dark:border-white mb-4" />
+            <p className="text-gray-700 dark:text-gray-300">Loading recommendations...</p>
+          </div>
+        </div>
+      }
+    >
+      <RecommendContent />
+    </Suspense>
   );
 }
